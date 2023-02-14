@@ -1,15 +1,13 @@
 # 1. Start by importing the necessary libraries and setting up the API clients 
 import requests
-import json
-import os
 import threading
 
 # OpenAI secret Key
-API_KEY = 'xxxxxxxxxxxsecretAPIxxxxxxxxxx'
+API_KEY = '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'
 # Models: text-davinci-003,text-curie-001,text-babbage-001,text-ada-001
 MODEL = 'text-davinci-003'
 # Telegram secret access bot token
-BOT_TOKEN = 'xxxxxxbotapikeyxxxxx'
+BOT_TOKEN = '5828213778:AAEcT5NlixzsK-8yWzG4XcNxu05A55ysB6k'
 # Defining the bot's personality using adjectives
 BOT_PERSONALITY = 'Answer in a funny tone, '
 # Specify your Chat Bot handle
@@ -18,27 +16,27 @@ CHATBOT_HANDLE = '@ask_chatgptbot'
 # 2a. Function that gets the response from OpenAI's chatbot
 def openAI(prompt):
     # Make the request to the OpenAI API
-    response = requests.post(
+    response  =  requests. post(
         'https://api.openai.com/v1/completions',
         headers={'Authorization': f'Bearer {API_KEY}'},
         json={'model': MODEL, 'prompt': prompt, 'temperature': 0.4, 'max_tokens': 300},
         timeout=10
     )
 
-    result = response.json()
-    final_result = ''.join(choice['text'] for choice in result['choices'])
+    result  =  response. json()
+    final_result  =  ''. join(choice['text'] for  choice  in  result['choices'])
     return final_result
 
 # 2b. Function that gets an Image from OpenAI
 def openAImage(prompt):
     # Make the request to the OpenAI API
-    resp = requests.post(
+    resp  =  requests. post(
         'https://api.openai.com/v1/images/generations',
         headers={'Authorization': f'Bearer {API_KEY}'},
         json={'prompt': prompt,'n' : 1, 'size': '1024x1024'},
         timeout=10
     )
-    response_text = json.loads(resp.text)
+    response_text  =  json. loads(resp. text)
       
     return response_text['data'][0]['url']
   
@@ -49,12 +47,12 @@ def telegram_bot_sendtext(bot_message,chat_id,msg_id):
         'text': bot_message,
         'reply_to_message_id': msg_id
     }
-    response = requests.post(
+    response  =  requests. post(
         'https://api.telegram.org/bot' + BOT_TOKEN + '/sendMessage',
         json=data,
         timeout=5
     )
-    return response.json()
+    return  response. json()
 
 # 3b. Function that sends an image to a specific telegram group
 def telegram_bot_sendimage(image_url, group_id, msg_id):
@@ -65,28 +63,28 @@ def telegram_bot_sendimage(image_url, group_id, msg_id):
     }
     url = 'https://api.telegram.org/bot' + BOT_TOKEN + '/sendPhoto'
     
-    response = requests.post(url, data=data, timeout=5)
-    return response.json()
+    response  =  requests. post(url, data=data, timeout=5)
+    return  response. json()
   
 # 4. Function that retrieves the latest requests from users in a Telegram group, 
 # generates a response using OpenAI, and sends the response back to the group.
 def Chatbot():
     # Retrieve last ID message from text file for ChatGPT update
-    cwd = os.getcwd()
+    cwd  =  os.getcwd()
     filename = cwd + '/chatgpt.txt'
-    if not os.path.exists(filename):
+    if  not  os. path.exists(filename):
         with open(filename, "w") as f:
-            f.write("1")
+            f. write("1")
     else:
         does_file_exist="File Exists"    
 
     with open(filename) as f:
-        last_update = f.read()
+        last_update  =  f. read()
         
     # Check for new messages in Telegram group
     url = f'https://api.telegram.org/bot{BOT_TOKEN}/getUpdates?offset={last_update}'
-    response = requests.get(url, timeout=5)
-    data = json.loads(response.content)
+    response  =  requests. get(url, timeout=5)
+    data  =  json. loads(response. content)
     print(data)   
     
     for result in data['result']:
@@ -105,12 +103,12 @@ def Chatbot():
                     
                     # Checking if user wants an image
                     if '/img' in result['message']['text']:
-                        prompt = result['message']['text'].replace("/img", "")
+                        prompt  =  result['message']['text']. replace("/img", "")
                         bot_response = openAImage(prompt)
                         print(telegram_bot_sendimage(bot_response, chat_id, msg_id))
                     # Checking that user mentionned chatbot's username in message
                     if CHATBOT_HANDLE in result['message']['text']:
-                        prompt = result['message']['text'].replace(CHATBOT_HANDLE, "")
+                        prompt  =  result['message']['text']. replace(CHATBOT_HANDLE, "")
                         # Calling OpenAI API using the bot's personality
                         bot_response = openAI(f"{BOT_PERSONALITY}{prompt}")
                         # Sending back response to telegram group
@@ -126,7 +124,7 @@ def Chatbot():
 
     # Updating file with last update ID
     with open(filename, 'w') as f:
-        f.write(last_update)
+        f. write(last_update)
     
     return "done"
 
@@ -135,8 +133,12 @@ def main():
     timertime=5
     Chatbot()   
     # 5 sec timer
-    threading.Timer(timertime, main).start()
+    threading. Timer(timertime, main). start()
 
 # Run the main function
 if __name__ == "__main__":
     main()
+    
+    
+    
+print("RN")
